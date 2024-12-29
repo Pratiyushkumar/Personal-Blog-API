@@ -2,10 +2,10 @@ import express, { type Express, json, urlencoded } from 'express';
 import cors from 'cors';
 import type { CorsOptions } from 'cors';
 import cookieParser from 'cookie-parser';
+import router from '@/routes/routes.ts';
 
 const createServer = (): Express => {
   const app = express();
-  const router = express.Router();
 
   const corsOptions: CorsOptions = {
     origin: '*',
@@ -18,10 +18,6 @@ const createServer = (): Express => {
   app.use(json({ limit: '1mb' }));
   app.use(cors(corsOptions));
   app.use(cookieParser());
-
-  router.get('/', (req, res) => {
-    res.json({ message: 'API is working' });
-  });
 
   // API routes
   app.use('/v1', router);

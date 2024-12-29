@@ -1,5 +1,5 @@
-import config from '@config/config.ts';
-import createServer from 'server.ts';
+import config from './src/config/config.ts';
+import createServer from './server.ts';
 
 const port = config.port;
 const server = createServer();
