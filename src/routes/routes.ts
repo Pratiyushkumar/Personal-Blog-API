@@ -6,7 +6,7 @@ const router: Router = Router();
 router.use('/auth', authRouter);
 
 router.get('/', (req, res) => {
-  res.send('Hello World');
+  res.send('Hello World! lets go...');
 });
 
 export default router;

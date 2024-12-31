@@ -10,6 +10,13 @@ export class Users {
     return user;
   }
 
+  static async findByUsername(username: string) {
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+    return user;
+  }
+
   static async createUser(userData: SignupRequestBody) {
     const hashedPassword = await hashPassword(userData.password);
     const user = await prisma.user.create({
