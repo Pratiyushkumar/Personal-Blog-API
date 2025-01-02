@@ -1,3 +1,4 @@
+import { SessionService } from '@/db/models/auth.model.ts';
 import { Users } from '@/db/models/users.model.ts';
 import type {
   SigninRequestBody,
@@ -23,6 +24,17 @@ export const userSignup = async (
     const user = await Users.createUser(reqBody);
     const token = generateToken({ userId: user.id, email: user.email });
     console.log(user);
+
+    const userSession = await SessionService.createSession(
+      user.id,
+      token,
+      '1d'
+    );
+
+    if (!userSession) {
+      res.status(500).json({ message: 'Server error: Something went wrong!' });
+      return;
+    }
 
     res.status(201).json({
       message: 'User created successfully',
@@ -74,6 +86,27 @@ export const userSigin = async (
     res.status(200).json({
       message: 'User logged in successfully',
     });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: 'Server error: Something went wrong!', error: error });
+  }
+};
+
+export const userSignout = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const token = req.header('authorization');
+    if (!token) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+    await SessionService.invalidateSession(token);
+
+    res.status(200).json({ message: 'User logged out successfully' });
   } catch (error) {
     console.error(error);
     res
