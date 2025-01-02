@@ -1,3 +1,4 @@
+import { SessionService } from '@/db/models/auth.model.ts';
 import { verifyToken } from '@/utils/jwt.ts';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -9,18 +10,28 @@ export const authMiddleware = async (
   try {
     const token = req.header('authorization');
 
+    console.log('token***', token);
+
     if (!token) {
       res.status(401).json({ message: 'Authentication token is missing' });
       return;
     }
 
-    const decodedToken = verifyToken(token);
-
-    if (!decodedToken) {
+    const session = await SessionService.findValidSession(token);
+    if (!session) {
       res.status(401).json({ message: 'Invalid or expired token' });
       return;
     }
 
+    const decodedToken = verifyToken(token);
+    if (!decodedToken) {
+      await SessionService.invalidateSession(token);
+      res.status(401).json({ message: 'Invalid or expired token' });
+      return;
+    }
+
+    req.user = decodedToken;
+    req.token = token;
     next();
   } catch (error) {
     console.error('Error verifying authentication token:', error);

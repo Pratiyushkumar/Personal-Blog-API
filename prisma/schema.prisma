@@ -27,7 +27,7 @@ model User {
 model Session {
     id         String   @id @default(uuid())
     user_id    String
-    token      String
+    token      String   @unique @db.VarChar(255)
     created_at DateTime @default(now())
     expired_at DateTime
     user       User     @relation(fields: [user_id], references: [id])
@@ -70,17 +70,20 @@ model Tags {
 }
 
 model Comments {
-    id                String     @id @default(uuid())
+    id                String   @id @default(uuid())
     post_id           String
     user_id           String
-    description       String
+    description       String   @db.Text
     parent_comment_id String?
-    created_at        DateTime   @default(now())
-    updated_at        DateTime   @updatedAt
-    post              Posts      @relation(fields: [post_id], references: [id])
-    user              User       @relation(fields: [user_id], references: [id])
-    parent_comment    Comments?  @relation("CommentsToComments", fields: [parent_comment_id], references: [id])
-    replies           Comments[] @relation("CommentsToComments")
+    created_at        DateTime @default(now())
+    updated_at        DateTime @updatedAt
+
+    post           Posts      @relation(fields: [post_id], references: [id], onDelete: Cascade)
+    user           User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    parent_comment Comments?  @relation("CommentsToComments", fields: [parent_comment_id], references: [id], onDelete: SetNull)
+    replies        Comments[] @relation("CommentsToComments")
+
+    @@map("comments")
 }
 
 model PostTags {
