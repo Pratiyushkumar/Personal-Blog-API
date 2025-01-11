@@ -6,3 +6,9 @@ export interface articleCreationBody {
   author_id: string;
   category_id?: string;
 }
+
+export interface articleUpdateBody {
+  title?: string;
+  featured_img_url?: string;
+  content?: string;
+}

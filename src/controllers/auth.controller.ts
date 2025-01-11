@@ -83,8 +83,18 @@ export const userSigin = async (
       return;
     }
 
+    const token = generateToken({ userId: user.id, email: user.email });
+    console.log('token', token);
+    await SessionService.createSession(user.id, token, '1d');
+
     res.status(200).json({
       message: 'User logged in successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        fullname: user.fullname,
+        username: user.username,
+      },
     });
   } catch (error) {
     console.error(error);

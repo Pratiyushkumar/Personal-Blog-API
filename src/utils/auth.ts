@@ -14,13 +14,10 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function verifyPassword(
-  hashedPassword: string,
-  password: string
+  password: string,
+  hashedPassword: string
 ): Promise<boolean> {
   try {
-    if (!hashedPassword.startsWith('$')) {
-      throw new Error('Invalid hash format');
-    }
     return await argon2.verify(hashedPassword, password);
   } catch (error) {
     console.log('Error hashing the password', error);
