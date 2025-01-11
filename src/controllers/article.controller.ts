@@ -67,3 +67,49 @@ export const getArticleByUserId = async (req: Request, res: Response) => {
     return;
   }
 };
+
+export const updateArticle = async (req: Request, res: Response) => {
+  const { article_id } = req.params;
+
+  try {
+    const article = await Post.getArticleById(article_id);
+    if (!article) {
+      res.status(404).json({ message: 'Article not found' });
+      return;
+    }
+
+    const updatedArticle = await Post.updateArticleById(article_id, req.body);
+
+    res.status(200).json({
+      message: 'Article updated successfully',
+      updatedArticle,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Server error: Something went wrong!', error: error });
+  }
+};
+
+export const deleteArticle = async (req: Request, res: Response) => {
+  const { article_id } = req.params;
+  try {
+    const article = await Post.getArticleById(article_id);
+    if (!article) {
+      res.status(404).json({ message: 'Article not found' });
+      return;
+    }
+
+    const deletedArticle = await Post.deleteArticleById(article_id);
+
+    res.status(200).json({
+      message: 'Article deleted successfully',
+      deletedArticle,
+    });
+  } catch (error) {
+    console.log('error in delete article', error);
+    res
+      .status(500)
+      .json({ message: 'Server error: Something went wrong!', error });
+  }
+};
