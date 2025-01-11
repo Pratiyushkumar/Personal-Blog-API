@@ -11,7 +11,7 @@ import { authMiddleware } from '@/middleware/authMiddleware.ts';
 const authRouter: Router = Router();
 
 authRouter.post('/signup', validate({ body: signupSchema }), userSignup);
-authRouter.get('/signin', authMiddleware, userSigin);
+authRouter.get('/signin', userSigin);
 authRouter.get('/signout', authMiddleware, userSignout);
 
 export default authRouter;
