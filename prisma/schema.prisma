@@ -53,7 +53,6 @@ model Posts {
 model Categories {
     id          String           @id @default(uuid())
     name        String           @unique
-    slug        String?          @unique
     description String?
     created_at  DateTime         @default(now())
     updated_at  DateTime         @updatedAt
@@ -61,18 +60,18 @@ model Categories {
 }
 
 model PostCategories {
+    id          String     @id @default(uuid())
     post        Posts      @relation(fields: [post_id], references: [id])
     post_id     String
     category    Categories @relation(fields: [category_id], references: [id])
     category_id String
 
-    @@id([post_id, category_id])
+    @@unique([post_id, category_id])
 }
 
 model Tags {
     id         String     @id @default(uuid())
     name       String     @unique
-    slug       String?    @unique
     created_at DateTime   @default(now())
     PostTags   PostTags[]
 }
@@ -88,9 +87,6 @@ model Comments {
 
     post           Posts      @relation(fields: [post_id], references: [id], onDelete: Cascade)
     user           User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    parent_comment Comments?  @relation("CommentsToComments", fields: [parent_comment_id], references: [id], onDelete: SetNull)
-    replies        Comments[] @relation("CommentsToComments")
-
     @@map("comments")
 }
 
