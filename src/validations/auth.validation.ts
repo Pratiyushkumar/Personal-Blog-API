@@ -35,7 +35,8 @@ export const signinSchema = z.object({
     .string()
     .trim()
     .email('Please enter a valid email address')
-    .max(255, 'Email must be less than 255 characters'),
+    .max(255, 'Email must be less than 255 characters')
+    .optional(),
   username: z.string().min(3).max(50).optional(),
   password: z.string().min(6).max(255),
 });
