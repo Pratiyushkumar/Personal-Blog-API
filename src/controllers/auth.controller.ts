@@ -31,6 +31,12 @@ export const userSignup = async (
       '1d'
     );
 
+    res.cookie('blogToken', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'strict',
+    });
+
     if (!userSession) {
       res.status(500).json({ message: 'Server error: Something went wrong!' });
       return;
@@ -86,6 +92,11 @@ export const userSigin = async (
     const token = generateToken({ userId: user.id, email: user.email });
     console.log('token', token);
     await SessionService.createSession(user.id, token, '1d');
+    res.cookie('blogToken', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'strict',
+    });
 
     res.status(200).json({
       message: 'User logged in successfully',
