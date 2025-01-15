@@ -45,7 +45,6 @@ model Posts {
     updated_at       DateTime         @updatedAt
     author           User             @relation(fields: [author_id], references: [id])
     comments         Comments[]
-    postTags         PostTags[]
     postLikes        PostLikes[]
     postCategories   PostCategories[]
 }
@@ -69,13 +68,6 @@ model PostCategories {
     @@unique([post_id, category_id])
 }
 
-model Tags {
-    id         String     @id @default(uuid())
-    name       String     @unique
-    created_at DateTime   @default(now())
-    PostTags   PostTags[]
-}
-
 model Comments {
     id                String   @id @default(uuid())
     post_id           String
@@ -88,15 +80,6 @@ model Comments {
     post           Posts      @relation(fields: [post_id], references: [id], onDelete: Cascade)
     user           User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
     @@map("comments")
-}
-
-model PostTags {
-    post_id String
-    tag_id  String
-    post    Posts  @relation(fields: [post_id], references: [id])
-    tag     Tags   @relation(fields: [tag_id], references: [id])
-
-    @@id([post_id, tag_id])
 }
 
 model Media {
