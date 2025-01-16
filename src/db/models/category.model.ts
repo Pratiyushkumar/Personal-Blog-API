@@ -9,4 +9,14 @@ export class Category {
       },
     });
   }
+
+  static async getCategory(param: string) {
+    const isUUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        param
+      );
+    return prisma.categories.findUnique({
+      where: isUUID ? { id: param } : { name: param },
+    });
+  }
 }
