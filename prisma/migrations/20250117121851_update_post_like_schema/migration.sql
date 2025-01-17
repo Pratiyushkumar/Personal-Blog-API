@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `postlikes` MODIFY `likeCount` INTEGER NOT NULL DEFAULT 0,
+    MODIFY `dislikeCount` INTEGER NOT NULL DEFAULT 0;

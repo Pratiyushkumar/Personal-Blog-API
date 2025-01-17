@@ -8,3 +8,11 @@ export const createArticleSchema = z.object({
   author_id: z.string().uuid(),
   category_id: z.string().uuid().optional(),
 });
+
+export const articleIdSchema = z.object({
+  article_id: z.string().uuid(),
+});
+
+export const articleReactionBodySchema = z.object({
+  reaction_type: z.enum(['like', 'dislike']),
+});
