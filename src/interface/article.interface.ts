@@ -12,3 +12,12 @@ export interface articleUpdateBody {
   featured_img_url?: string;
   content?: string;
 }
+
+export interface filterOption {
+  searchQuery?: string;
+  filters?: {
+    categoryName?: string;
+    authorName?: string;
+    title?: string;
+  };
+}

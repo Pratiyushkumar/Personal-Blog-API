@@ -16,3 +16,10 @@ export const articleIdSchema = z.object({
 export const articleReactionBodySchema = z.object({
   reaction_type: z.enum(['like', 'dislike']),
 });
+
+export const articleQuerySchema = z.object({
+  searchQuery: z.string().optional(),
+  categoryName: z.string().uuid().optional(),
+  authorName: z.string().uuid().optional(),
+  title: z.string().optional(),
+});
