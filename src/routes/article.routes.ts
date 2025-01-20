@@ -3,12 +3,14 @@ import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { validate } from '@/middleware/validateMiddleware.ts';
 import {
   articleIdSchema,
+  articleQuerySchema,
   articleReactionBodySchema,
   createArticleSchema,
 } from '@/validations/article.validation.ts';
 import {
   createArticle,
   deleteArticle,
+  filterArticles,
   getAllArticles,
   getArticleByUserId,
   getArticleReactionDetails,
@@ -27,6 +29,12 @@ articleRoute.post(
 
 articleRoute.get('/', authMiddleware, getAllArticles);
 
+articleRoute.get(
+  '/filter',
+  authMiddleware,
+  validate({ query: articleQuerySchema }),
+  filterArticles
+);
 articleRoute.get('/:user_id', authMiddleware, getArticleByUserId);
 
 articleRoute.put('/:article_id', authMiddleware, updateArticle);
@@ -40,6 +48,11 @@ articleRoute.post(
   likeDislikeArticle
 );
 
-articleRoute.get('/:article_id/reaction/count', authMiddleware, validate({ params: articleIdSchema }),getArticleReactionDetails);
+articleRoute.get(
+  '/:article_id/reaction/count',
+  authMiddleware,
+  validate({ params: articleIdSchema }),
+  getArticleReactionDetails
+);
 
 export default articleRoute;

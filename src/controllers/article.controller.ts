@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { Post } from '@/db/models/article.model.ts';
 import { Users } from '@/db/models/users.model.ts';
 import { Reaction } from '@/db/models/reaction.model.ts';
+import type { filterOption } from '@/interface/article.interface.ts';
 
 export const createArticle = async (
   req: Request,
@@ -188,5 +189,44 @@ export const getArticleReactionDetails = async (
       .status(500)
       .json({ message: 'Server error: Something went wrong!', error });
     return;
+  }
+};
+
+export const filterArticles = async (req: Request, res: Response) => {
+  console.log('filterArticles controller called');
+  try {
+    const { searchQuery, title, authorName, categoryName } = req.query;
+
+    const filterOptions: filterOption = {
+      searchQuery: searchQuery as string,
+      filters: {
+        title: title as string,
+        authorName: authorName as string,
+        categoryName: categoryName as string,
+      },
+    };
+
+    Object.keys(filterOptions).forEach((key) => {
+      const typedKey = key as keyof filterOption;
+      if (filterOptions[typedKey] === undefined) {
+        delete filterOptions[typedKey];
+      }
+    });
+
+    const articles = await Post.filterArticles(filterOptions);
+
+    if (!articles) {
+      res.status(404).json({ message: 'No articles found' });
+      return;
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Articles fetched successfully', articles });
+    return;
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Server error: Something went wrong!', error: error });
   }
 };

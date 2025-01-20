@@ -2,13 +2,36 @@ import { prisma } from '../connection.ts';
 import type {
   articleCreationBody,
   articleUpdateBody,
+  filterOption,
 } from '@/interface/article.interface.ts';
 
 export class Post {
   static async createArticle(post: articleCreationBody) {
     return prisma.posts.create({
       data: {
-        ...post,
+        title: post.title,
+        content: post.content,
+        author_id: post.author_id,
+        slug: post.slug,
+        featured_img_url: post.featured_img_url,
+        postCategories: post.category_id
+          ? {
+              create: {
+                category: {
+                  connect: {
+                    id: post.category_id,
+                  },
+                },
+              },
+            }
+          : undefined,
+      },
+      include: {
+        postCategories: {
+          include: {
+            category: true,
+          },
+        },
       },
     });
   }
@@ -48,6 +71,76 @@ export class Post {
     return prisma.posts.delete({
       where: {
         id: id,
+      },
+    });
+  }
+
+  static async filterArticles(options: filterOption) {
+    // const where: any = {};
+    const OR = [];
+
+    if (options.searchQuery) {
+      OR.push(
+        { title: { contains: options.searchQuery } },
+        {
+          author: {
+            fullname: { contains: options.searchQuery },
+          },
+        },
+        {
+          postCategories: {
+            some: {
+              category: {
+                name: { contains: options.searchQuery },
+              },
+            },
+          },
+        }
+      );
+    }
+
+    if (options.filters) {
+      const { title, authorName, categoryName } = options.filters;
+
+      if (title) {
+        OR.push({ title: { contains: title } });
+      }
+
+      if (authorName) {
+        OR.push({
+          author: { fullname: { contains: authorName } },
+        });
+      }
+
+      if (categoryName) {
+        OR.push({
+          postCategories: {
+            some: {
+              category: {
+                name: { contains: categoryName },
+              },
+            },
+          },
+        });
+      }
+    }
+    return prisma.posts.findMany({
+      where: OR.length > 0 ? { OR } : {},
+      include: {
+        author: {
+          select: {
+            fullname: true,
+            username: true,
+          },
+        },
+        postCategories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
       },
     });
   }
