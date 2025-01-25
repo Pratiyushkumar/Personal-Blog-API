@@ -36,8 +36,45 @@ export class Post {
     });
   }
 
-  static async getAllArticles() {
-    return prisma.posts.findMany();
+  static async getAllArticles(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [posts, total] = await Promise.all([
+      prisma.posts.findMany({
+        skip,
+        take: limit,
+        include: {
+          author: {
+            select: {
+              fullname: true,
+              username: true,
+            },
+          },
+          postCategories: {
+            include: {
+              category: true,
+            },
+          },
+          postLikes: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+      }),
+      prisma.posts.count(),
+    ]);
+
+    return {
+      posts,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPage: Math.ceil(total / limit),
+        hasNextPage: total - skip - limit > 0,
+        hasPrevPage: page > 1,
+      },
+    };
   }
 
   static async getAuthorsArticle(author_id: string) {

@@ -6,6 +6,7 @@ import {
   articleQuerySchema,
   articleReactionBodySchema,
   createArticleSchema,
+  paginationQuerySchema,
 } from '@/validations/article.validation.ts';
 import {
   createArticle,
@@ -27,7 +28,12 @@ articleRoute.post(
   createArticle
 );
 
-articleRoute.get('/', authMiddleware, getAllArticles);
+articleRoute.get(
+  '/',
+  authMiddleware,
+  validate({ query: paginationQuerySchema }),
+  getAllArticles
+);
 
 articleRoute.get(
   '/filter',

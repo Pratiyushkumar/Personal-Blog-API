@@ -23,3 +23,16 @@ export const articleQuerySchema = z.object({
   authorName: z.string().uuid().optional(),
   title: z.string().optional(),
 });
+
+export const paginationQuerySchema = z.object({
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : 1))
+    .refine((val) => val > 0, { message: 'Page must be greater than 0' }),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : 10))
+    .refine((val) => val > 0, { message: 'Limit must be greater than 0' }),
+});

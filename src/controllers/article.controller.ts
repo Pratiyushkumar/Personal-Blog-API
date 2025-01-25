@@ -27,8 +27,15 @@ export const getAllArticles = async (
   res: Response
 ): Promise<void> => {
   try {
-    const getAllArticles = await Post.getAllArticles();
-    if (!getAllArticles) {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    if (page < 1 || limit < 1) {
+      res.status(400).json({ message: 'Invalid page or limit' });
+      return;
+    }
+    const getAllArticles = await Post.getAllArticles(page, limit);
+    if (!getAllArticles.posts.length) {
       res.status(404).json({ message: 'No articles found' });
       return;
     }
