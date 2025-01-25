@@ -8,20 +8,19 @@ datasource db {
 }
 
 model User {
-    id         String      @id @default(uuid())
-    fullname   String      @db.VarChar(255)
-    email      String      @unique @db.VarChar(255)
-    password   String      @db.VarChar(255)
-    username   String      @unique @db.VarChar(50)
-    avatar_url String?     @db.VarChar(255)
-    bio        String?     @db.Text
-    created_at DateTime    @default(now())
-    updated_at DateTime    @updatedAt
+    id         String     @id @default(uuid())
+    fullname   String     @db.VarChar(255)
+    email      String     @unique @db.VarChar(255)
+    password   String     @db.VarChar(255)
+    username   String     @unique @db.VarChar(50)
+    avatar_url String?    @db.VarChar(255)
+    bio        String?    @db.Text
+    created_at DateTime   @default(now())
+    updated_at DateTime   @updatedAt
     Session    Session[]
     Posts      Posts[]
     Comments   Comments[]
     Media      Media[]
-    PostLikes  PostLikes[]
 }
 
 model Session {
@@ -45,7 +44,6 @@ model Posts {
     updated_at       DateTime         @updatedAt
     author           User             @relation(fields: [author_id], references: [id])
     comments         Comments[]
-    postTags         PostTags[]
     postLikes        PostLikes[]
     postCategories   PostCategories[]
 }
@@ -53,7 +51,6 @@ model Posts {
 model Categories {
     id          String           @id @default(uuid())
     name        String           @unique
-    slug        String?          @unique
     description String?
     created_at  DateTime         @default(now())
     updated_at  DateTime         @updatedAt
@@ -61,20 +58,13 @@ model Categories {
 }
 
 model PostCategories {
+    id          String     @id @default(uuid())
     post        Posts      @relation(fields: [post_id], references: [id])
     post_id     String
     category    Categories @relation(fields: [category_id], references: [id])
     category_id String
 
-    @@id([post_id, category_id])
-}
-
-model Tags {
-    id         String     @id @default(uuid())
-    name       String     @unique
-    slug       String?    @unique
-    created_at DateTime   @default(now())
-    PostTags   PostTags[]
+    @@unique([post_id, category_id])
 }
 
 model Comments {
@@ -86,21 +76,10 @@ model Comments {
     created_at        DateTime @default(now())
     updated_at        DateTime @updatedAt
 
-    post           Posts      @relation(fields: [post_id], references: [id], onDelete: Cascade)
-    user           User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    parent_comment Comments?  @relation("CommentsToComments", fields: [parent_comment_id], references: [id], onDelete: SetNull)
-    replies        Comments[] @relation("CommentsToComments")
+    post Posts @relation(fields: [post_id], references: [id], onDelete: Cascade)
+    user User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     @@map("comments")
-}
-
-model PostTags {
-    post_id String
-    tag_id  String
-    post    Posts  @relation(fields: [post_id], references: [id])
-    tag     Tags   @relation(fields: [tag_id], references: [id])
-
-    @@id([post_id, tag_id])
 }
 
 model Media {
@@ -115,11 +94,10 @@ model Media {
 }
 
 model PostLikes {
-    id         String   @id @default(uuid())
-    likeCount  Int
-    post_id    String
-    user_id    String
-    created_at DateTime @default(now())
-    post       Posts    @relation(fields: [post_id], references: [id])
-    user       User     @relation(fields: [user_id], references: [id])
+    id           String   @id @default(uuid())
+    likeCount    Int      @default(0)
+    dislikeCount Int      @default(0)
+    post_id      String   @unique
+    created_at   DateTime @default(now())
+    post         Posts    @relation(fields: [post_id], references: [id])
 }
